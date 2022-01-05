@@ -136,8 +136,8 @@ class CustomAuth {
     this.isInitialized = true;
   }
 
-  async triggerLogin(args: SubVerifierDetails & { registerOnly?: boolean }): Promise<TorusLoginResponse> {
-    const { verifier, typeOfLogin, clientId, jwtParams, hash, queryParameters, customState, registerOnly } = args;
+  async triggerLogin(args: SubVerifierDetails & { registerOnly?: boolean; skipTorusKey?: boolean }): Promise<TorusLoginResponse> {
+    const { verifier, typeOfLogin, clientId, jwtParams, hash, queryParameters, customState, registerOnly, skipTorusKey } = args;
     log.info("Verifier: ", verifier);
     if (!this.isInitialized) {
       throw new Error("Not initialized yet");
@@ -198,13 +198,15 @@ class CustomAuth {
       return { ...res, ...torusKey };
     }
 
-    const torusKey = await this.getTorusKey(
-      verifier,
-      userInfo.verifierId,
-      { verifier_id: userInfo.verifierId },
-      loginParams.idToken || loginParams.accessToken,
-      userInfo.extraVerifierParams
-    );
+    const torusKey = skipTorusKey
+      ? (undefined as TorusKey)
+      : await this.getTorusKey(
+          verifier,
+          userInfo.verifierId,
+          { verifier_id: userInfo.verifierId },
+          loginParams.idToken || loginParams.accessToken,
+          userInfo.extraVerifierParams
+        );
     return {
       ...torusKey,
       userInfo: {
@@ -214,9 +216,9 @@ class CustomAuth {
     };
   }
 
-  async triggerAggregateLogin(args: AggregateLoginParams): Promise<TorusAggregateLoginResponse> {
+  async triggerAggregateLogin(args: AggregateLoginParams & { skipTorusKey?: boolean }): Promise<TorusAggregateLoginResponse> {
     // This method shall break if any of the promises fail. This behaviour is intended
-    const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray } = args;
+    const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray, skipTorusKey } = args;
     if (!this.isInitialized) {
       throw new Error("Not initialized yet");
     }
@@ -281,7 +283,9 @@ class CustomAuth {
     aggregateIdTokenSeeds.sort();
     const aggregateIdToken = keccak256(aggregateIdTokenSeeds.join(String.fromCharCode(29))).slice(2);
     aggregateVerifierParams.verifier_id = aggregateVerifierId;
-    const torusKey = await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
+    const torusKey = skipTorusKey
+      ? (undefined as TorusKey)
+      : await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
     return {
       ...torusKey,
       userInfo: userInfoArray.map((x, index) => ({ ...x, ...loginParamsArray[index] })),
