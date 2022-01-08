@@ -1,5 +1,5 @@
 import NodeDetailManager from "@toruslabs/fetch-node-details";
-import Torus from "@toruslabs/torus.js";
+import Torus, { keyLookup } from "@toruslabs/torus.js";
 import { keccak256 } from "web3-utils";
 
 import createHandler from "./handlers/HandlerFactory";
@@ -197,8 +197,15 @@ class CustomAuth {
       };
       return { ...res, ...torusKey };
     }
-
-    const torusKey = skipTorusKey
+    let skip = skipTorusKey;
+    if (skip) {
+      const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails(false, true);
+      const lookupData = await keyLookup(torusNodeEndpoints, verifier, clientId);
+      if (lookupData?.keyResult?.keys?.length) {
+        skip = false;
+      }
+    }
+    const torusKey = skip
       ? (undefined as TorusKey)
       : await this.getTorusKey(
           verifier,
@@ -283,7 +290,15 @@ class CustomAuth {
     aggregateIdTokenSeeds.sort();
     const aggregateIdToken = keccak256(aggregateIdTokenSeeds.join(String.fromCharCode(29))).slice(2);
     aggregateVerifierParams.verifier_id = aggregateVerifierId;
-    const torusKey = skipTorusKey
+    let skip = skipTorusKey;
+    if (skip) {
+      const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails(false, true);
+      const lookupData = await keyLookup(torusNodeEndpoints, args.verifierIdentifier, args.subVerifierDetailsArray[0].clientId);
+      if (lookupData?.keyResult?.keys?.length) {
+        skip = false;
+      }
+    }
+    const torusKey = skip
       ? (undefined as TorusKey)
       : await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
     return {
