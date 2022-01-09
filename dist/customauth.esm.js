@@ -1329,7 +1329,7 @@ class CustomAuth {
       let skip = skipTorusKey;
       if (skip) {
         const { torusNodeEndpoints } = yield this.nodeDetailManager.getNodeDetails(false, true);
-        const lookupData = yield keyLookup(torusNodeEndpoints, verifier, clientId);
+        const lookupData = yield keyLookup(torusNodeEndpoints, verifier, userInfo.verifierId);
         if (
           (_b = (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
             null || _b === void 0
@@ -1420,10 +1420,11 @@ class CustomAuth {
       aggregateIdTokenSeeds.sort();
       const aggregateIdToken = keccak256(aggregateIdTokenSeeds.join(String.fromCharCode(29))).slice(2);
       aggregateVerifierParams.verifier_id = aggregateVerifierId;
+      const userInfoData = userInfoArray.map((x, index) => Object.assign(Object.assign({}, x), loginParamsArray[index]));
       let skip = skipTorusKey;
       if (skip) {
         const { torusNodeEndpoints } = yield this.nodeDetailManager.getNodeDetails(false, true);
-        const lookupData = yield keyLookup(torusNodeEndpoints, args.verifierIdentifier, args.subVerifierDetailsArray[0].clientId);
+        const lookupData = yield keyLookup(torusNodeEndpoints, args.verifierIdentifier, userInfoData[0].verifierId);
         if (
           (_b = (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
             null || _b === void 0
@@ -1436,9 +1437,7 @@ class CustomAuth {
       const torusKey = skip
         ? undefined
         : yield this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
-      return Object.assign(Object.assign({}, torusKey), {
-        userInfo: userInfoArray.map((x, index) => Object.assign(Object.assign({}, x), loginParamsArray[index])),
-      });
+      return Object.assign(Object.assign({}, torusKey), { userInfo: userInfoData });
     });
   }
   triggerHybridAggregateLogin(args) {

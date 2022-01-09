@@ -200,7 +200,7 @@ class CustomAuth {
     let skip = skipTorusKey;
     if (skip) {
       const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails(false, true);
-      const lookupData = await keyLookup(torusNodeEndpoints, verifier, clientId);
+      const lookupData = await keyLookup(torusNodeEndpoints, verifier, userInfo.verifierId);
       if (lookupData?.keyResult?.keys?.length) {
         skip = false;
       }
@@ -290,10 +290,11 @@ class CustomAuth {
     aggregateIdTokenSeeds.sort();
     const aggregateIdToken = keccak256(aggregateIdTokenSeeds.join(String.fromCharCode(29))).slice(2);
     aggregateVerifierParams.verifier_id = aggregateVerifierId;
+    const userInfoData = userInfoArray.map((x, index) => ({ ...x, ...loginParamsArray[index] }));
     let skip = skipTorusKey;
     if (skip) {
       const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails(false, true);
-      const lookupData = await keyLookup(torusNodeEndpoints, args.verifierIdentifier, args.subVerifierDetailsArray[0].clientId);
+      const lookupData = await keyLookup(torusNodeEndpoints, args.verifierIdentifier, userInfoData[0].verifierId);
       if (lookupData?.keyResult?.keys?.length) {
         skip = false;
       }
@@ -303,7 +304,7 @@ class CustomAuth {
       : await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
     return {
       ...torusKey,
-      userInfo: userInfoArray.map((x, index) => ({ ...x, ...loginParamsArray[index] })),
+      userInfo: userInfoData,
     };
   }
 

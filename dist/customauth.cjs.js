@@ -3444,7 +3444,7 @@ module.exports = /******/ (function (modules) {
                             _yield$this$nodeDetai2 = _context2.sent;
                             _torusNodeEndpoints = _yield$this$nodeDetai2.torusNodeEndpoints;
                             _context2.next = 47;
-                            return Object(torus_js_["keyLookup"])(_torusNodeEndpoints, verifier, clientId);
+                            return Object(torus_js_["keyLookup"])(_torusNodeEndpoints, verifier, userInfo.verifierId);
 
                           case 47:
                             lookupData = _context2.sent;
@@ -3560,6 +3560,7 @@ module.exports = /******/ (function (modules) {
                     accessToken,
                     userInfo,
                     aggregateIdToken,
+                    userInfoData,
                     skip,
                     _lookupData$keyResult3,
                     _lookupData$keyResult4,
@@ -3771,27 +3772,26 @@ module.exports = /******/ (function (modules) {
                               2
                             );
                             aggregateVerifierParams.verifier_id = aggregateVerifierId;
+                            userInfoData = userInfoArray.map(function (x, index) {
+                              return login_objectSpread(login_objectSpread({}, x), loginParamsArray[index]);
+                            });
                             skip = skipTorusKey;
 
                             if (!skip) {
-                              _context3.next = 66;
+                              _context3.next = 67;
                               break;
                             }
 
-                            _context3.next = 60;
+                            _context3.next = 61;
                             return this.nodeDetailManager.getNodeDetails(false, true);
 
-                          case 60:
+                          case 61:
                             _yield$this$nodeDetai3 = _context3.sent;
                             torusNodeEndpoints = _yield$this$nodeDetai3.torusNodeEndpoints;
-                            _context3.next = 64;
-                            return Object(torus_js_["keyLookup"])(
-                              torusNodeEndpoints,
-                              args.verifierIdentifier,
-                              args.subVerifierDetailsArray[0].clientId
-                            );
+                            _context3.next = 65;
+                            return Object(torus_js_["keyLookup"])(torusNodeEndpoints, args.verifierIdentifier, userInfoData[0].verifierId);
 
-                          case 64:
+                          case 65:
                             lookupData = _context3.sent;
 
                             if (
@@ -3806,18 +3806,18 @@ module.exports = /******/ (function (modules) {
                               skip = false;
                             }
 
-                          case 66:
+                          case 67:
                             if (!skip) {
-                              _context3.next = 70;
+                              _context3.next = 71;
                               break;
                             }
 
                             _context3.t1 = undefined;
-                            _context3.next = 73;
+                            _context3.next = 74;
                             break;
 
-                          case 70:
-                            _context3.next = 72;
+                          case 71:
+                            _context3.next = 73;
                             return this.getTorusKey(
                               verifierIdentifier,
                               aggregateVerifierId,
@@ -3826,10 +3826,10 @@ module.exports = /******/ (function (modules) {
                               extraVerifierParams
                             );
 
-                          case 72:
+                          case 73:
                             _context3.t1 = _context3.sent;
 
-                          case 73:
+                          case 74:
                             torusKey = _context3.t1;
                             return _context3.abrupt(
                               "return",
@@ -3837,14 +3837,12 @@ module.exports = /******/ (function (modules) {
                                 login_objectSpread({}, torusKey),
                                 {},
                                 {
-                                  userInfo: userInfoArray.map(function (x, index) {
-                                    return login_objectSpread(login_objectSpread({}, x), loginParamsArray[index]);
-                                  }),
+                                  userInfo: userInfoData,
                                 }
                               )
                             );
 
-                          case 75:
+                          case 76:
                           case "end":
                             return _context3.stop();
                         }
