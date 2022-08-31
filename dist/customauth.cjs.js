@@ -247,6 +247,9 @@ module.exports = /******/ (function (modules) {
       __webpack_require__.d(__webpack_exports__, "createHandler", function () {
         return /* reexport */ HandlerFactory;
       });
+      __webpack_require__.d(__webpack_exports__, "SkipTorusKey", function () {
+        return /* reexport */ SkipTorusKey;
+      });
       __webpack_require__.d(__webpack_exports__, "default", function () {
         return /* reexport */ login;
       });
@@ -2876,7 +2879,13 @@ module.exports = /******/ (function (modules) {
 
       /* harmony default export */ var HandlerFactory = HandlerFactory_createHandler;
       // CONCATENATED MODULE: ./src/handlers/interfaces.ts
+      var SkipTorusKey;
 
+      (function (SkipTorusKey) {
+        SkipTorusKey[(SkipTorusKey["Never"] = 0)] = "Never";
+        SkipTorusKey[(SkipTorusKey["IfNew"] = 1)] = "IfNew";
+        SkipTorusKey[(SkipTorusKey["Always"] = 2)] = "Always";
+      })(SkipTorusKey || (SkipTorusKey = {}));
       // EXTERNAL MODULE: external "@toruslabs/fetch-node-details"
       var fetch_node_details_ = __webpack_require__(19);
       var fetch_node_details_default = /*#__PURE__*/ __webpack_require__.n(fetch_node_details_);
@@ -3240,7 +3249,10 @@ module.exports = /******/ (function (modules) {
                     queryParameters,
                     customState,
                     registerOnly,
+                    _args$skipTorusKey,
                     skipTorusKey,
+                    _args$checkIfNewKey,
+                    checkIfNewKey,
                     loginHandler,
                     loginParams,
                     _handleRedirectParame,
@@ -3258,6 +3270,7 @@ module.exports = /******/ (function (modules) {
                     res,
                     _torusKey,
                     skip,
+                    isNewKey,
                     _lookupData$keyResult,
                     _lookupData$keyResult2,
                     _yield$this$nodeDetai2,
@@ -3278,7 +3291,10 @@ module.exports = /******/ (function (modules) {
                               (queryParameters = args.queryParameters),
                               (customState = args.customState),
                               (registerOnly = args.registerOnly),
-                              (skipTorusKey = args.skipTorusKey);
+                              (_args$skipTorusKey = args.skipTorusKey),
+                              (skipTorusKey = _args$skipTorusKey === void 0 ? SkipTorusKey.Never : _args$skipTorusKey),
+                              (_args$checkIfNewKey = args.checkIfNewKey),
+                              (checkIfNewKey = _args$checkIfNewKey === void 0 ? false : _args$checkIfNewKey);
                             loglevel.info("Verifier: ", verifier);
 
                             if (this.isInitialized) {
@@ -3430,9 +3446,9 @@ module.exports = /******/ (function (modules) {
                             return _context2.abrupt("return", login_objectSpread(login_objectSpread({}, res), _torusKey));
 
                           case 39:
-                            skip = skipTorusKey;
+                            skip = true;
 
-                            if (!skip) {
+                            if (!(checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew)) {
                               _context2.next = 49;
                               break;
                             }
@@ -3448,8 +3464,7 @@ module.exports = /******/ (function (modules) {
 
                           case 47:
                             lookupData = _context2.sent;
-
-                            if (
+                            isNewKey = !(
                               lookupData !== null &&
                               lookupData !== void 0 &&
                               (_lookupData$keyResult = lookupData.keyResult) !== null &&
@@ -3457,22 +3472,47 @@ module.exports = /******/ (function (modules) {
                               (_lookupData$keyResult2 = _lookupData$keyResult.keys) !== null &&
                               _lookupData$keyResult2 !== void 0 &&
                               _lookupData$keyResult2.length
-                            ) {
-                              skip = false;
-                            }
+                            );
 
                           case 49:
+                            _context2.t0 = skipTorusKey;
+                            _context2.next =
+                              _context2.t0 === SkipTorusKey.IfNew
+                                ? 52
+                                : _context2.t0 === SkipTorusKey.Always
+                                ? 54
+                                : _context2.t0 === SkipTorusKey.Never
+                                ? 56
+                                : 58;
+                            break;
+
+                          case 52:
+                            skip = isNewKey;
+                            return _context2.abrupt("break", 59);
+
+                          case 54:
+                            skip = true;
+                            return _context2.abrupt("break", 59);
+
+                          case 56:
+                            skip = false;
+                            return _context2.abrupt("break", 59);
+
+                          case 58:
+                            throw new Error("Invalid SkipTorusKey");
+
+                          case 59:
                             if (!skip) {
-                              _context2.next = 53;
+                              _context2.next = 63;
                               break;
                             }
 
-                            _context2.t0 = undefined;
-                            _context2.next = 56;
+                            _context2.t1 = undefined;
+                            _context2.next = 66;
                             break;
 
-                          case 53:
-                            _context2.next = 55;
+                          case 63:
+                            _context2.next = 65;
                             return this.getTorusKey(
                               verifier,
                               userInfo.verifierId,
@@ -3483,23 +3523,24 @@ module.exports = /******/ (function (modules) {
                               userInfo.extraVerifierParams
                             );
 
-                          case 55:
-                            _context2.t0 = _context2.sent;
+                          case 65:
+                            _context2.t1 = _context2.sent;
 
-                          case 56:
-                            torusKey = _context2.t0;
+                          case 66:
+                            torusKey = _context2.t1;
                             return _context2.abrupt(
                               "return",
                               login_objectSpread(
                                 login_objectSpread({}, torusKey),
                                 {},
                                 {
+                                  isNewKey: isNewKey,
                                   userInfo: login_objectSpread(login_objectSpread({}, userInfo), loginParams),
                                 }
                               )
                             );
 
-                          case 58:
+                          case 68:
                           case "end":
                             return _context2.stop();
                         }
@@ -3526,7 +3567,10 @@ module.exports = /******/ (function (modules) {
                   var aggregateVerifierType,
                     verifierIdentifier,
                     subVerifierDetailsArray,
+                    _args$skipTorusKey2,
                     skipTorusKey,
+                    _args$checkIfNewKey2,
+                    checkIfNewKey,
                     userInfoPromises,
                     loginParamsArray,
                     _iterator,
@@ -3562,6 +3606,7 @@ module.exports = /******/ (function (modules) {
                     aggregateIdToken,
                     userInfoData,
                     skip,
+                    isNewKey,
                     _lookupData$keyResult3,
                     _lookupData$keyResult4,
                     _yield$this$nodeDetai3,
@@ -3578,7 +3623,10 @@ module.exports = /******/ (function (modules) {
                             (aggregateVerifierType = args.aggregateVerifierType),
                               (verifierIdentifier = args.verifierIdentifier),
                               (subVerifierDetailsArray = args.subVerifierDetailsArray),
-                              (skipTorusKey = args.skipTorusKey);
+                              (_args$skipTorusKey2 = args.skipTorusKey),
+                              (skipTorusKey = _args$skipTorusKey2 === void 0 ? SkipTorusKey.Never : _args$skipTorusKey2),
+                              (_args$checkIfNewKey2 = args.checkIfNewKey),
+                              (checkIfNewKey = _args$checkIfNewKey2 === void 0 ? false : _args$checkIfNewKey2);
 
                             if (this.isInitialized) {
                               _context3.next = 3;
@@ -3775,9 +3823,9 @@ module.exports = /******/ (function (modules) {
                             userInfoData = userInfoArray.map(function (x, index) {
                               return login_objectSpread(login_objectSpread({}, x), loginParamsArray[index]);
                             });
-                            skip = skipTorusKey;
+                            skip = true;
 
-                            if (!skip) {
+                            if (!(checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew)) {
                               _context3.next = 67;
                               break;
                             }
@@ -3793,8 +3841,7 @@ module.exports = /******/ (function (modules) {
 
                           case 65:
                             lookupData = _context3.sent;
-
-                            if (
+                            isNewKey = !(
                               lookupData !== null &&
                               lookupData !== void 0 &&
                               (_lookupData$keyResult3 = lookupData.keyResult) !== null &&
@@ -3802,22 +3849,47 @@ module.exports = /******/ (function (modules) {
                               (_lookupData$keyResult4 = _lookupData$keyResult3.keys) !== null &&
                               _lookupData$keyResult4 !== void 0 &&
                               _lookupData$keyResult4.length
-                            ) {
-                              skip = false;
-                            }
+                            );
 
                           case 67:
+                            _context3.t1 = skipTorusKey;
+                            _context3.next =
+                              _context3.t1 === SkipTorusKey.IfNew
+                                ? 70
+                                : _context3.t1 === SkipTorusKey.Always
+                                ? 72
+                                : _context3.t1 === SkipTorusKey.Never
+                                ? 74
+                                : 76;
+                            break;
+
+                          case 70:
+                            skip = isNewKey;
+                            return _context3.abrupt("break", 77);
+
+                          case 72:
+                            skip = true;
+                            return _context3.abrupt("break", 77);
+
+                          case 74:
+                            skip = false;
+                            return _context3.abrupt("break", 77);
+
+                          case 76:
+                            throw new Error("Invalid SkipTorusKey");
+
+                          case 77:
                             if (!skip) {
-                              _context3.next = 71;
+                              _context3.next = 81;
                               break;
                             }
 
-                            _context3.t1 = undefined;
-                            _context3.next = 74;
+                            _context3.t2 = undefined;
+                            _context3.next = 84;
                             break;
 
-                          case 71:
-                            _context3.next = 73;
+                          case 81:
+                            _context3.next = 83;
                             return this.getTorusKey(
                               verifierIdentifier,
                               aggregateVerifierId,
@@ -3826,23 +3898,24 @@ module.exports = /******/ (function (modules) {
                               extraVerifierParams
                             );
 
-                          case 73:
-                            _context3.t1 = _context3.sent;
+                          case 83:
+                            _context3.t2 = _context3.sent;
 
-                          case 74:
-                            torusKey = _context3.t1;
+                          case 84:
+                            torusKey = _context3.t2;
                             return _context3.abrupt(
                               "return",
                               login_objectSpread(
                                 login_objectSpread({}, torusKey),
                                 {},
                                 {
+                                  isNewKey: isNewKey,
                                   userInfo: userInfoData,
                                 }
                               )
                             );
 
-                          case 76:
+                          case 86:
                           case "end":
                             return _context3.stop();
                         }

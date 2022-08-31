@@ -1154,6 +1154,13 @@ const createHandler = ({ clientId, redirect_uri, typeOfLogin, verifier, jwtParam
   }
 };
 
+var SkipTorusKey;
+(function (SkipTorusKey) {
+  SkipTorusKey[(SkipTorusKey["Never"] = 0)] = "Never";
+  SkipTorusKey[(SkipTorusKey["IfNew"] = 1)] = "IfNew";
+  SkipTorusKey[(SkipTorusKey["Always"] = 2)] = "Always";
+})(SkipTorusKey || (SkipTorusKey = {}));
+
 const registerServiceWorker = (baseUrl) =>
   new Promise((resolve, reject) => {
     const swUrl = `${baseUrl}sw.js`;
@@ -1270,7 +1277,18 @@ class CustomAuth {
   triggerLogin(args) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
-      const { verifier, typeOfLogin, clientId, jwtParams, hash, queryParameters, customState, registerOnly, skipTorusKey } = args;
+      const {
+        verifier,
+        typeOfLogin,
+        clientId,
+        jwtParams,
+        hash,
+        queryParameters,
+        customState,
+        registerOnly,
+        skipTorusKey = SkipTorusKey.Never,
+        checkIfNewKey = false,
+      } = args;
       log.info("Verifier: ", verifier);
       if (!this.isInitialized) {
         throw new Error("Not initialized yet");
@@ -1326,18 +1344,29 @@ class CustomAuth {
         };
         return Object.assign(Object.assign({}, res), torusKey);
       }
-      let skip = skipTorusKey;
-      if (skip) {
+      let skip = true;
+      let isNewKey;
+      if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
         const { torusNodeEndpoints } = yield this.nodeDetailManager.getNodeDetails(false, true);
         const lookupData = yield keyLookup(torusNodeEndpoints, verifier, userInfo.verifierId);
-        if (
-          (_b = (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
-            null || _b === void 0
-            ? void 0
-            : _b.length
-        ) {
+        isNewKey = !((_b =
+          (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
+          null || _b === void 0
+          ? void 0
+          : _b.length);
+      }
+      switch (skipTorusKey) {
+        case SkipTorusKey.IfNew:
+          skip = isNewKey;
+          break;
+        case SkipTorusKey.Always:
+          skip = true;
+          break;
+        case SkipTorusKey.Never:
           skip = false;
-        }
+          break;
+        default:
+          throw new Error("Invalid SkipTorusKey");
       }
       const torusKey = skip
         ? undefined
@@ -1348,14 +1377,14 @@ class CustomAuth {
             loginParams.idToken || loginParams.accessToken,
             userInfo.extraVerifierParams
           );
-      return Object.assign(Object.assign({}, torusKey), { userInfo: Object.assign(Object.assign({}, userInfo), loginParams) });
+      return Object.assign(Object.assign({}, torusKey), { isNewKey, userInfo: Object.assign(Object.assign({}, userInfo), loginParams) });
     });
   }
   triggerAggregateLogin(args) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
       // This method shall break if any of the promises fail. This behaviour is intended
-      const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray, skipTorusKey } = args;
+      const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray, skipTorusKey = SkipTorusKey.Never, checkIfNewKey = false } = args;
       if (!this.isInitialized) {
         throw new Error("Not initialized yet");
       }
@@ -1421,23 +1450,34 @@ class CustomAuth {
       const aggregateIdToken = keccak256(aggregateIdTokenSeeds.join(String.fromCharCode(29))).slice(2);
       aggregateVerifierParams.verifier_id = aggregateVerifierId;
       const userInfoData = userInfoArray.map((x, index) => Object.assign(Object.assign({}, x), loginParamsArray[index]));
-      let skip = skipTorusKey;
-      if (skip) {
+      let skip = true;
+      let isNewKey;
+      if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
         const { torusNodeEndpoints } = yield this.nodeDetailManager.getNodeDetails(false, true);
         const lookupData = yield keyLookup(torusNodeEndpoints, args.verifierIdentifier, userInfoData[0].verifierId);
-        if (
-          (_b = (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
-            null || _b === void 0
-            ? void 0
-            : _b.length
-        ) {
+        isNewKey = !((_b =
+          (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
+          null || _b === void 0
+          ? void 0
+          : _b.length);
+      }
+      switch (skipTorusKey) {
+        case SkipTorusKey.IfNew:
+          skip = isNewKey;
+          break;
+        case SkipTorusKey.Always:
+          skip = true;
+          break;
+        case SkipTorusKey.Never:
           skip = false;
-        }
+          break;
+        default:
+          throw new Error("Invalid SkipTorusKey");
       }
       const torusKey = skip
         ? undefined
         : yield this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
-      return Object.assign(Object.assign({}, torusKey), { userInfo: userInfoData });
+      return Object.assign(Object.assign({}, torusKey), { isNewKey, userInfo: userInfoData });
     });
   }
   triggerHybridAggregateLogin(args) {
@@ -1688,6 +1728,7 @@ export {
   ETHEREUM_NETWORK,
   LOGIN,
   REDIRECT_PARAMS_STORAGE_METHOD,
+  SkipTorusKey,
   TORUS_METHOD,
   TORUS_NETWORK,
   UX_MODE,

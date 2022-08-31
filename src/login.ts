@@ -13,6 +13,7 @@ import {
   LoginWindowResponse,
   RedirectResult,
   RedirectResultParams,
+  SkipTorusKey,
   SubVerifierDetails,
   TorusAggregateLoginResponse,
   TorusHybridAggregateLoginResponse,
@@ -136,8 +137,21 @@ class CustomAuth {
     this.isInitialized = true;
   }
 
-  async triggerLogin(args: SubVerifierDetails & { registerOnly?: boolean; skipTorusKey?: boolean }): Promise<TorusLoginResponse> {
-    const { verifier, typeOfLogin, clientId, jwtParams, hash, queryParameters, customState, registerOnly, skipTorusKey } = args;
+  async triggerLogin(
+    args: SubVerifierDetails & { registerOnly?: boolean; skipTorusKey?: SkipTorusKey; checkIfNewKey?: boolean }
+  ): Promise<TorusLoginResponse> {
+    const {
+      verifier,
+      typeOfLogin,
+      clientId,
+      jwtParams,
+      hash,
+      queryParameters,
+      customState,
+      registerOnly,
+      skipTorusKey = SkipTorusKey.Never,
+      checkIfNewKey = false,
+    } = args;
     log.info("Verifier: ", verifier);
     if (!this.isInitialized) {
       throw new Error("Not initialized yet");
@@ -197,13 +211,26 @@ class CustomAuth {
       };
       return { ...res, ...torusKey };
     }
-    let skip = skipTorusKey;
-    if (skip) {
+
+    let skip = true;
+    let isNewKey: boolean;
+    if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
       const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails(false, true);
       const lookupData = await keyLookup(torusNodeEndpoints, verifier, userInfo.verifierId);
-      if (lookupData?.keyResult?.keys?.length) {
+      isNewKey = !lookupData?.keyResult?.keys?.length;
+    }
+    switch (skipTorusKey) {
+      case SkipTorusKey.IfNew:
+        skip = isNewKey;
+        break;
+      case SkipTorusKey.Always:
+        skip = true;
+        break;
+      case SkipTorusKey.Never:
         skip = false;
-      }
+        break;
+      default:
+        throw new Error("Invalid SkipTorusKey");
     }
     const torusKey = skip
       ? (undefined as TorusKey)
@@ -216,6 +243,7 @@ class CustomAuth {
         );
     return {
       ...torusKey,
+      isNewKey,
       userInfo: {
         ...userInfo,
         ...loginParams,
@@ -223,9 +251,11 @@ class CustomAuth {
     };
   }
 
-  async triggerAggregateLogin(args: AggregateLoginParams & { skipTorusKey?: boolean }): Promise<TorusAggregateLoginResponse> {
+  async triggerAggregateLogin(
+    args: AggregateLoginParams & { skipTorusKey?: SkipTorusKey; checkIfNewKey?: boolean }
+  ): Promise<TorusAggregateLoginResponse> {
     // This method shall break if any of the promises fail. This behaviour is intended
-    const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray, skipTorusKey } = args;
+    const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray, skipTorusKey = SkipTorusKey.Never, checkIfNewKey = false } = args;
     if (!this.isInitialized) {
       throw new Error("Not initialized yet");
     }
@@ -291,19 +321,32 @@ class CustomAuth {
     const aggregateIdToken = keccak256(aggregateIdTokenSeeds.join(String.fromCharCode(29))).slice(2);
     aggregateVerifierParams.verifier_id = aggregateVerifierId;
     const userInfoData = userInfoArray.map((x, index) => ({ ...x, ...loginParamsArray[index] }));
-    let skip = skipTorusKey;
-    if (skip) {
+    let skip = true;
+    let isNewKey: boolean;
+    if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
       const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails(false, true);
       const lookupData = await keyLookup(torusNodeEndpoints, args.verifierIdentifier, userInfoData[0].verifierId);
-      if (lookupData?.keyResult?.keys?.length) {
+      isNewKey = !lookupData?.keyResult?.keys?.length;
+    }
+    switch (skipTorusKey) {
+      case SkipTorusKey.IfNew:
+        skip = isNewKey;
+        break;
+      case SkipTorusKey.Always:
+        skip = true;
+        break;
+      case SkipTorusKey.Never:
         skip = false;
-      }
+        break;
+      default:
+        throw new Error("Invalid SkipTorusKey");
     }
     const torusKey = skip
       ? (undefined as TorusKey)
       : await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
     return {
       ...torusKey,
+      isNewKey,
       userInfo: userInfoData,
     };
   }
