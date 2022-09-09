@@ -3270,9 +3270,11 @@ module.exports = /******/ (function (modules) {
                     res,
                     _torusKey,
                     skip,
-                    isNewKey,
+                    existingPk,
                     _lookupData$keyResult,
                     _lookupData$keyResult2,
+                    _lookupData$keyResult3,
+                    _lookupData$keyResult4,
                     _yield$this$nodeDetai2,
                     _torusNodeEndpoints,
                     lookupData,
@@ -3464,7 +3466,7 @@ module.exports = /******/ (function (modules) {
 
                           case 47:
                             lookupData = _context2.sent;
-                            isNewKey = !(
+                            existingPk =
                               lookupData !== null &&
                               lookupData !== void 0 &&
                               (_lookupData$keyResult = lookupData.keyResult) !== null &&
@@ -3472,7 +3474,21 @@ module.exports = /******/ (function (modules) {
                               (_lookupData$keyResult2 = _lookupData$keyResult.keys) !== null &&
                               _lookupData$keyResult2 !== void 0 &&
                               _lookupData$keyResult2.length
-                            );
+                                ? {
+                                    X:
+                                      lookupData === null || lookupData === void 0
+                                        ? void 0
+                                        : (_lookupData$keyResult3 = lookupData.keyResult) === null || _lookupData$keyResult3 === void 0
+                                        ? void 0
+                                        : _lookupData$keyResult3.keys[0].pub_key_X,
+                                    Y:
+                                      lookupData === null || lookupData === void 0
+                                        ? void 0
+                                        : (_lookupData$keyResult4 = lookupData.keyResult) === null || _lookupData$keyResult4 === void 0
+                                        ? void 0
+                                        : _lookupData$keyResult4.keys[0].pub_key_Y,
+                                  }
+                                : undefined;
 
                           case 49:
                             _context2.t0 = skipTorusKey;
@@ -3487,7 +3503,7 @@ module.exports = /******/ (function (modules) {
                             break;
 
                           case 52:
-                            skip = isNewKey;
+                            skip = !existingPk;
                             return _context2.abrupt("break", 59);
 
                           case 54:
@@ -3534,7 +3550,7 @@ module.exports = /******/ (function (modules) {
                                 login_objectSpread({}, torusKey),
                                 {},
                                 {
-                                  isNewKey: isNewKey,
+                                  existingPk: existingPk,
                                   userInfo: login_objectSpread(login_objectSpread({}, userInfo), loginParams),
                                 }
                               )
@@ -3606,9 +3622,11 @@ module.exports = /******/ (function (modules) {
                     aggregateIdToken,
                     userInfoData,
                     skip,
-                    isNewKey,
-                    _lookupData$keyResult3,
-                    _lookupData$keyResult4,
+                    existingPk,
+                    _lookupData$keyResult5,
+                    _lookupData$keyResult6,
+                    _lookupData$keyResult7,
+                    _lookupData$keyResult8,
                     _yield$this$nodeDetai3,
                     torusNodeEndpoints,
                     lookupData,
@@ -3841,15 +3859,29 @@ module.exports = /******/ (function (modules) {
 
                           case 65:
                             lookupData = _context3.sent;
-                            isNewKey = !(
+                            existingPk =
                               lookupData !== null &&
                               lookupData !== void 0 &&
-                              (_lookupData$keyResult3 = lookupData.keyResult) !== null &&
-                              _lookupData$keyResult3 !== void 0 &&
-                              (_lookupData$keyResult4 = _lookupData$keyResult3.keys) !== null &&
-                              _lookupData$keyResult4 !== void 0 &&
-                              _lookupData$keyResult4.length
-                            );
+                              (_lookupData$keyResult5 = lookupData.keyResult) !== null &&
+                              _lookupData$keyResult5 !== void 0 &&
+                              (_lookupData$keyResult6 = _lookupData$keyResult5.keys) !== null &&
+                              _lookupData$keyResult6 !== void 0 &&
+                              _lookupData$keyResult6.length
+                                ? {
+                                    X:
+                                      lookupData === null || lookupData === void 0
+                                        ? void 0
+                                        : (_lookupData$keyResult7 = lookupData.keyResult) === null || _lookupData$keyResult7 === void 0
+                                        ? void 0
+                                        : _lookupData$keyResult7.keys[0].pub_key_X,
+                                    Y:
+                                      lookupData === null || lookupData === void 0
+                                        ? void 0
+                                        : (_lookupData$keyResult8 = lookupData.keyResult) === null || _lookupData$keyResult8 === void 0
+                                        ? void 0
+                                        : _lookupData$keyResult8.keys[0].pub_key_Y,
+                                  }
+                                : undefined;
 
                           case 67:
                             _context3.t1 = skipTorusKey;
@@ -3864,7 +3896,7 @@ module.exports = /******/ (function (modules) {
                             break;
 
                           case 70:
-                            skip = isNewKey;
+                            skip = !existingPk;
                             return _context3.abrupt("break", 77);
 
                           case 72:
@@ -3909,7 +3941,7 @@ module.exports = /******/ (function (modules) {
                                 login_objectSpread({}, torusKey),
                                 {},
                                 {
-                                  isNewKey: isNewKey,
+                                  existingPk: existingPk,
                                   userInfo: userInfoData,
                                 }
                               )

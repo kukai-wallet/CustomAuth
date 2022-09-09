@@ -213,15 +213,17 @@ class CustomAuth {
     }
 
     let skip = true;
-    let isNewKey: boolean;
+    let existingPk: { X: string; Y: string };
     if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
       const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails(false, true);
       const lookupData = await keyLookup(torusNodeEndpoints, verifier, userInfo.verifierId);
-      isNewKey = !lookupData?.keyResult?.keys?.length;
+      existingPk = lookupData?.keyResult?.keys?.length
+        ? { X: lookupData?.keyResult?.keys[0].pub_key_X, Y: lookupData?.keyResult?.keys[0].pub_key_Y }
+        : undefined;
     }
     switch (skipTorusKey) {
       case SkipTorusKey.IfNew:
-        skip = isNewKey;
+        skip = !existingPk;
         break;
       case SkipTorusKey.Always:
         skip = true;
@@ -243,7 +245,7 @@ class CustomAuth {
         );
     return {
       ...torusKey,
-      isNewKey,
+      existingPk,
       userInfo: {
         ...userInfo,
         ...loginParams,
@@ -322,15 +324,17 @@ class CustomAuth {
     aggregateVerifierParams.verifier_id = aggregateVerifierId;
     const userInfoData = userInfoArray.map((x, index) => ({ ...x, ...loginParamsArray[index] }));
     let skip = true;
-    let isNewKey: boolean;
+    let existingPk: { X: string; Y: string };
     if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
       const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails(false, true);
       const lookupData = await keyLookup(torusNodeEndpoints, args.verifierIdentifier, userInfoData[0].verifierId);
-      isNewKey = !lookupData?.keyResult?.keys?.length;
+      existingPk = lookupData?.keyResult?.keys?.length
+        ? { X: lookupData?.keyResult?.keys[0].pub_key_X, Y: lookupData?.keyResult?.keys[0].pub_key_Y }
+        : undefined;
     }
     switch (skipTorusKey) {
       case SkipTorusKey.IfNew:
-        skip = isNewKey;
+        skip = !existingPk;
         break;
       case SkipTorusKey.Always:
         skip = true;
@@ -346,7 +350,7 @@ class CustomAuth {
       : await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
     return {
       ...torusKey,
-      isNewKey,
+      existingPk,
       userInfo: userInfoData,
     };
   }

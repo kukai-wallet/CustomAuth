@@ -83,7 +83,7 @@ export interface TorusKeyPub {
 export interface TorusKey extends TorusKeyPub {
   publicAddress: string;
   privateKey: string;
-  isNewKey?: boolean;
+  existingPk?: { X: string; Y: string };
   metadataNonce: string;
   typeOfUser: "v1" | "v2";
 }

@@ -1275,7 +1275,7 @@ class CustomAuth {
     });
   }
   triggerLogin(args) {
-    var _a, _b;
+    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
       const {
         verifier,
@@ -1345,19 +1345,31 @@ class CustomAuth {
         return Object.assign(Object.assign({}, res), torusKey);
       }
       let skip = true;
-      let isNewKey;
+      let existingPk;
       if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
         const { torusNodeEndpoints } = yield this.nodeDetailManager.getNodeDetails(false, true);
         const lookupData = yield keyLookup(torusNodeEndpoints, verifier, userInfo.verifierId);
-        isNewKey = !((_b =
-          (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
-          null || _b === void 0
-          ? void 0
-          : _b.length);
+        existingPk = (
+          (_b = (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
+            null || _b === void 0
+            ? void 0
+            : _b.length
+        )
+          ? {
+              X:
+                (_c = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _c === void 0
+                  ? void 0
+                  : _c.keys[0].pub_key_X,
+              Y:
+                (_d = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _d === void 0
+                  ? void 0
+                  : _d.keys[0].pub_key_Y,
+            }
+          : undefined;
       }
       switch (skipTorusKey) {
         case SkipTorusKey.IfNew:
-          skip = isNewKey;
+          skip = !existingPk;
           break;
         case SkipTorusKey.Always:
           skip = true;
@@ -1377,11 +1389,11 @@ class CustomAuth {
             loginParams.idToken || loginParams.accessToken,
             userInfo.extraVerifierParams
           );
-      return Object.assign(Object.assign({}, torusKey), { isNewKey, userInfo: Object.assign(Object.assign({}, userInfo), loginParams) });
+      return Object.assign(Object.assign({}, torusKey), { existingPk, userInfo: Object.assign(Object.assign({}, userInfo), loginParams) });
     });
   }
   triggerAggregateLogin(args) {
-    var _a, _b;
+    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
       // This method shall break if any of the promises fail. This behaviour is intended
       const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray, skipTorusKey = SkipTorusKey.Never, checkIfNewKey = false } = args;
@@ -1451,19 +1463,31 @@ class CustomAuth {
       aggregateVerifierParams.verifier_id = aggregateVerifierId;
       const userInfoData = userInfoArray.map((x, index) => Object.assign(Object.assign({}, x), loginParamsArray[index]));
       let skip = true;
-      let isNewKey;
+      let existingPk;
       if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
         const { torusNodeEndpoints } = yield this.nodeDetailManager.getNodeDetails(false, true);
         const lookupData = yield keyLookup(torusNodeEndpoints, args.verifierIdentifier, userInfoData[0].verifierId);
-        isNewKey = !((_b =
-          (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
-          null || _b === void 0
-          ? void 0
-          : _b.length);
+        existingPk = (
+          (_b = (_a = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _a === void 0 ? void 0 : _a.keys) ===
+            null || _b === void 0
+            ? void 0
+            : _b.length
+        )
+          ? {
+              X:
+                (_c = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _c === void 0
+                  ? void 0
+                  : _c.keys[0].pub_key_X,
+              Y:
+                (_d = lookupData === null || lookupData === void 0 ? void 0 : lookupData.keyResult) === null || _d === void 0
+                  ? void 0
+                  : _d.keys[0].pub_key_Y,
+            }
+          : undefined;
       }
       switch (skipTorusKey) {
         case SkipTorusKey.IfNew:
-          skip = isNewKey;
+          skip = !existingPk;
           break;
         case SkipTorusKey.Always:
           skip = true;
@@ -1477,7 +1501,7 @@ class CustomAuth {
       const torusKey = skip
         ? undefined
         : yield this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
-      return Object.assign(Object.assign({}, torusKey), { isNewKey, userInfo: userInfoData });
+      return Object.assign(Object.assign({}, torusKey), { existingPk, userInfo: userInfoData });
     });
   }
   triggerHybridAggregateLogin(args) {
