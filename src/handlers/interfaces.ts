@@ -80,8 +80,15 @@ export interface TorusKeyPub {
 export interface TorusKey extends TorusKeyPub {
   publicAddress: string;
   privateKey: string;
+  existingPk?: { X: string; Y: string }; // if any
   metadataNonce: string;
   typeOfUser: "v1" | "v2";
+}
+
+export enum SkipTorusKey {
+  Never,
+  IfNew,
+  Always,
 }
 
 export interface TorusAggregateVerifierResponse {
