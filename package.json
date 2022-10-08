@@ -11,7 +11,7 @@
     "build": "torus-scripts build",
     "start": "torus-scripts start",
     "release": "torus-scripts release",
-    "lint:ts": "eslint --fix 'src/**/*.ts'",
+    "lint:ts": "eslint --fix ./src/**/*.ts",
     "prepack": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install"
