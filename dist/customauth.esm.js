@@ -3052,8 +3052,12 @@ var CustomAuth = /*#__PURE__*/ (function () {
       network: networkUrl || network,
       proxyAddress: CONTRACT_MAP[network],
     });
-    if (enableLogging) log.enableAll();
-    else log.disableAll();
+
+    if (enableLogging) {
+      log.enableAll();
+      log.debug("enabled logging", true);
+    } else log.disableAll();
+
     this.storageHelper = new StorageHelper(storageServerUrl);
     this.sentryHandler = new SentryHandler(sentry, networkUrl);
   }
@@ -3230,7 +3234,6 @@ var CustomAuth = /*#__PURE__*/ (function () {
                 while (1) {
                   switch ((_context2.prev = _context2.next)) {
                     case 0:
-                      // eslint-disable-next-line
                       log.debug("start", Date.now() - 1665658000000);
                       (verifier = args.verifier),
                         (typeOfLogin = args.typeOfLogin),
@@ -3507,7 +3510,6 @@ var CustomAuth = /*#__PURE__*/ (function () {
 
                     case 72:
                       torusKey = _context2.t1;
-                      // eslint-disable-next-line
                       log.info("end", Date.now() - 1665658000000);
                       return _context2.abrupt(
                         "return",

@@ -88,8 +88,10 @@ class CustomAuth {
     Torus.setAPIKey(apiKey);
     this.torus = torus;
     this.nodeDetailManager = new NodeDetailManager({ network: networkUrl || network, proxyAddress: CONTRACT_MAP[network] });
-    if (enableLogging) log.enableAll();
-    else log.disableAll();
+    if (enableLogging) {
+      log.enableAll();
+      log.debug("enabled logging", true);
+    } else log.disableAll();
     this.storageHelper = new StorageHelper(storageServerUrl);
     this.sentryHandler = new SentryHandler(sentry, networkUrl);
   }
