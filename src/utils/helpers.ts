@@ -176,7 +176,7 @@ export function constructURL(params: { baseURL: string; query?: Record<string, u
 
 export function are3PCSupported(): boolean {
   const browserInfo = Bowser.parse(navigator.userAgent);
-  log.info(JSON.stringify(browserInfo), "current browser info");
+  log.info(JSON.stringify(browserInfo), "current browser infos");
 
   let thirdPartyCookieSupport = true;
   // brave

@@ -268,7 +268,7 @@ function are3PCSupported() {
   var _navigator;
 
   var browserInfo = Bowser.parse(navigator.userAgent);
-  log.info(JSON.stringify(browserInfo), "current browser info");
+  log.info(JSON.stringify(browserInfo), "current browser infos");
   var thirdPartyCookieSupport = true; // brave
 
   if ((_navigator = navigator) !== null && _navigator !== void 0 && _navigator.brave) {

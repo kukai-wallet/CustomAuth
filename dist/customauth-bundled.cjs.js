@@ -42257,7 +42257,7 @@ Resets the providers, clears all callbacks
       var _navigator;
 
       var browserInfo = external_bowser_default().parse(navigator.userAgent);
-      loglevel.info(JSON.stringify(browserInfo), "current browser info");
+      loglevel.info(JSON.stringify(browserInfo), "current browser infos");
       var thirdPartyCookieSupport = true; // brave
 
       if ((_navigator = navigator) !== null && _navigator !== void 0 && _navigator.brave) {
