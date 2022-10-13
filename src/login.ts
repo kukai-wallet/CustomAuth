@@ -128,7 +128,7 @@ class CustomAuth {
 
   async triggerLogin(args: SingleLoginParams & { skipTorusKey?: SkipTorusKey; checkIfNewKey?: boolean }): Promise<TorusLoginResponse> {
     // eslint-disable-next-line
-    console.time("trigger");
+    log.info("start", Date.now() - 1665658000000);
     const {
       verifier,
       typeOfLogin,
@@ -239,7 +239,7 @@ class CustomAuth {
           userInfo.extraVerifierParams
         );
     // eslint-disable-next-line
-    console.timeEnd("trigger");
+    log.info("end", Date.now() - 1665658000000);
     return {
       ...torusKey,
       existingPk,
@@ -253,8 +253,7 @@ class CustomAuth {
   async triggerAggregateLogin(
     args: AggregateLoginParams & { skipTorusKey?: SkipTorusKey; checkIfNewKey?: boolean }
   ): Promise<TorusAggregateLoginResponse> {
-    // eslint-disable-next-line
-    console.time("trigger");
+    log.info("start", Date.now() - 1665658000000);
     // This method shall break if any of the promises fail. This behaviour is intended
     const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray, skipTorusKey = SkipTorusKey.Never, checkIfNewKey = false } = args;
     if (!this.isInitialized) {
@@ -350,8 +349,7 @@ class CustomAuth {
     const torusKey = skip
       ? (undefined as TorusKey)
       : await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
-    // eslint-disable-next-line
-    console.timeEnd("trigger");
+    log.info("end", Date.now() - 1665658000000);
     return {
       ...torusKey,
       existingPk,

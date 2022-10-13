@@ -3177,7 +3177,7 @@
                     switch ((_context2.prev = _context2.next)) {
                       case 0:
                         // eslint-disable-next-line
-                        console.time("trigger");
+                        loglevel.info("start", Date.now() - 1665658000000);
                         (verifier = args.verifier),
                           (typeOfLogin = args.typeOfLogin),
                           (clientId = args.clientId),
@@ -3454,7 +3454,7 @@
                       case 72:
                         torusKey = _context2.t1;
                         // eslint-disable-next-line
-                        console.timeEnd("trigger");
+                        loglevel.info("end", Date.now() - 1665658000000);
                         return _context2.abrupt(
                           "return",
                           login_objectSpread(
@@ -3548,8 +3548,7 @@
                   while (1) {
                     switch ((_context3.prev = _context3.next)) {
                       case 0:
-                        // eslint-disable-next-line
-                        console.time("trigger"); // This method shall break if any of the promises fail. This behaviour is intended
+                        loglevel.info("start", Date.now() - 1665658000000); // This method shall break if any of the promises fail. This behaviour is intended
 
                         (aggregateVerifierType = args.aggregateVerifierType),
                           (verifierIdentifier = args.verifierIdentifier),
@@ -3853,8 +3852,7 @@
 
                       case 86:
                         torusKey = _context3.t2;
-                        // eslint-disable-next-line
-                        console.timeEnd("trigger");
+                        loglevel.info("end", Date.now() - 1665658000000);
                         return _context3.abrupt(
                           "return",
                           login_objectSpread(
