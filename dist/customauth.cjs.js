@@ -3177,7 +3177,7 @@
                     switch ((_context2.prev = _context2.next)) {
                       case 0:
                         // eslint-disable-next-line
-                        loglevel.info("start", Date.now() - 1665658000000);
+                        loglevel.debug("start", Date.now() - 1665658000000);
                         (verifier = args.verifier),
                           (typeOfLogin = args.typeOfLogin),
                           (clientId = args.clientId),
@@ -3190,7 +3190,7 @@
                           (skipTorusKey = _args$skipTorusKey === void 0 ? SkipTorusKey.Never : _args$skipTorusKey),
                           (_args$checkIfNewKey = args.checkIfNewKey),
                           (checkIfNewKey = _args$checkIfNewKey === void 0 ? false : _args$checkIfNewKey);
-                        loglevel.info("Verifier: ", verifier);
+                        loglevel.debug("Verifier: ", verifier);
 
                         if (this.isInitialized) {
                           _context2.next = 5;
@@ -3548,7 +3548,7 @@
                   while (1) {
                     switch ((_context3.prev = _context3.next)) {
                       case 0:
-                        loglevel.info("start", Date.now() - 1665658000000); // This method shall break if any of the promises fail. This behaviour is intended
+                        loglevel.debug("start", Date.now() - 1665658000000); // This method shall break if any of the promises fail. This behaviour is intended
 
                         (aggregateVerifierType = args.aggregateVerifierType),
                           (verifierIdentifier = args.verifierIdentifier),
@@ -3852,7 +3852,7 @@
 
                       case 86:
                         torusKey = _context3.t2;
-                        loglevel.info("end", Date.now() - 1665658000000);
+                        loglevel.debug("end", Date.now() - 1665658000000);
                         return _context3.abrupt(
                           "return",
                           login_objectSpread(

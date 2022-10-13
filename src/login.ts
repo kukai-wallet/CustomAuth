@@ -127,8 +127,7 @@ class CustomAuth {
   }
 
   async triggerLogin(args: SingleLoginParams & { skipTorusKey?: SkipTorusKey; checkIfNewKey?: boolean }): Promise<TorusLoginResponse> {
-    // eslint-disable-next-line
-    log.info("start", Date.now() - 1665658000000);
+    log.debug("start", Date.now() - 1665658000000);
     const {
       verifier,
       typeOfLogin,
@@ -141,7 +140,7 @@ class CustomAuth {
       skipTorusKey = SkipTorusKey.Never,
       checkIfNewKey = false,
     } = args;
-    log.info("Verifier: ", verifier);
+    log.debug("Verifier: ", verifier);
     if (!this.isInitialized) {
       throw new Error("Not initialized yet");
     }
@@ -238,7 +237,7 @@ class CustomAuth {
           loginParams.idToken || loginParams.accessToken,
           userInfo.extraVerifierParams
         );
-    // eslint-disable-next-line
+
     log.info("end", Date.now() - 1665658000000);
     return {
       ...torusKey,
@@ -253,7 +252,7 @@ class CustomAuth {
   async triggerAggregateLogin(
     args: AggregateLoginParams & { skipTorusKey?: SkipTorusKey; checkIfNewKey?: boolean }
   ): Promise<TorusAggregateLoginResponse> {
-    log.info("start", Date.now() - 1665658000000);
+    log.debug("start", Date.now() - 1665658000000);
     // This method shall break if any of the promises fail. This behaviour is intended
     const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray, skipTorusKey = SkipTorusKey.Never, checkIfNewKey = false } = args;
     if (!this.isInitialized) {
@@ -349,7 +348,7 @@ class CustomAuth {
     const torusKey = skip
       ? (undefined as TorusKey)
       : await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
-    log.info("end", Date.now() - 1665658000000);
+    log.debug("end", Date.now() - 1665658000000);
     return {
       ...torusKey,
       existingPk,
