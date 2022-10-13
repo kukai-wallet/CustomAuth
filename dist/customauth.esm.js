@@ -3230,6 +3230,8 @@ var CustomAuth = /*#__PURE__*/ (function () {
                 while (1) {
                   switch ((_context2.prev = _context2.next)) {
                     case 0:
+                      // eslint-disable-next-line
+                      console.time("trigger");
                       (verifier = args.verifier),
                         (typeOfLogin = args.typeOfLogin),
                         (clientId = args.clientId),
@@ -3245,21 +3247,21 @@ var CustomAuth = /*#__PURE__*/ (function () {
                       log.info("Verifier: ", verifier);
 
                       if (this.isInitialized) {
-                        _context2.next = 4;
+                        _context2.next = 5;
                         break;
                       }
 
                       throw new Error("Not initialized yet");
 
-                    case 4:
+                    case 5:
                       if (!(registerOnly && typeOfLogin !== LOGIN.WEBAUTHN)) {
-                        _context2.next = 6;
+                        _context2.next = 7;
                         break;
                       }
 
                       throw new Error("registerOnly flag can only be passed for webauthn");
 
-                    case 6:
+                    case 7:
                       loginHandler = createHandler({
                         typeOfLogin: typeOfLogin,
                         clientId: clientId,
@@ -3273,7 +3275,7 @@ var CustomAuth = /*#__PURE__*/ (function () {
                       });
 
                       if (!(hash && queryParameters)) {
-                        _context2.next = 15;
+                        _context2.next = 16;
                         break;
                       }
 
@@ -3283,13 +3285,13 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         (instanceParameters = _handleRedirectParame.instanceParameters);
 
                       if (!error) {
-                        _context2.next = 11;
+                        _context2.next = 12;
                         break;
                       }
 
                       throw new Error(error);
 
-                    case 11:
+                    case 12:
                       (accessToken = hashParameters.access_token),
                         (idToken = hashParameters.id_token),
                         (rest = _objectWithoutProperties(hashParameters, _excluded)); // State has to be last here otherwise it will be overwritten
@@ -3307,12 +3309,12 @@ var CustomAuth = /*#__PURE__*/ (function () {
                           state: instanceParameters,
                         }
                       );
-                      _context2.next = 23;
+                      _context2.next = 24;
                       break;
 
-                    case 15:
+                    case 16:
                       this.storageHelper.clearOrphanedLoginDetails();
-                      _context2.next = 18;
+                      _context2.next = 19;
                       return this.storageHelper.storeLoginDetails(
                         {
                           method: TORUS_METHOD.TRIGGER_LOGIN,
@@ -3321,45 +3323,45 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         loginHandler.nonce
                       );
 
-                    case 18:
-                      _context2.next = 20;
+                    case 19:
+                      _context2.next = 21;
                       return loginHandler.handleLoginWindow({
                         locationReplaceOnRedirect: this.config.locationReplaceOnRedirect,
                         popupFeatures: this.config.popupFeatures,
                       });
 
-                    case 20:
+                    case 21:
                       loginParams = _context2.sent;
 
                       if (!(this.config.uxMode === UX_MODE.REDIRECT)) {
-                        _context2.next = 23;
+                        _context2.next = 24;
                         break;
                       }
 
                       return _context2.abrupt("return", null);
 
-                    case 23:
-                      _context2.next = 25;
+                    case 24:
+                      _context2.next = 26;
                       return loginHandler.getUserInfo(loginParams);
 
-                    case 25:
+                    case 26:
                       userInfo = _context2.sent;
 
                       if (!registerOnly) {
-                        _context2.next = 44;
+                        _context2.next = 45;
                         break;
                       }
 
                       nodeTx = this.sentryHandler.startTransaction({
                         name: SENTRY_TXNS.FETCH_NODE_DETAILS,
                       });
-                      _context2.next = 30;
+                      _context2.next = 31;
                       return this.nodeDetailManager.getNodeDetails({
                         verifier: verifier,
                         verifierId: userInfo.verifierId,
                       });
 
-                    case 30:
+                    case 31:
                       _yield$this$nodeDetai = _context2.sent;
                       torusNodeEndpoints = _yield$this$nodeDetai.torusNodeEndpoints;
                       torusNodePub = _yield$this$nodeDetai.torusNodePub;
@@ -3367,7 +3369,7 @@ var CustomAuth = /*#__PURE__*/ (function () {
                       lookupTx = this.sentryHandler.startTransaction({
                         name: SENTRY_TXNS.PUB_ADDRESS_LOOKUP,
                       });
-                      _context2.next = 37;
+                      _context2.next = 38;
                       return this.torus.getPublicAddress(
                         torusNodeEndpoints,
                         torusNodePub,
@@ -3378,7 +3380,7 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         true
                       );
 
-                    case 37:
+                    case 38:
                       torusPubKey = _context2.sent;
                       this.sentryHandler.finishTransaction(lookupTx);
                       res = {
@@ -3386,13 +3388,13 @@ var CustomAuth = /*#__PURE__*/ (function () {
                       };
 
                       if (!(typeof torusPubKey === "string")) {
-                        _context2.next = 42;
+                        _context2.next = 43;
                         break;
                       }
 
                       throw new Error("should have returned extended pub key");
 
-                    case 42:
+                    case 43:
                       _torusKey = {
                         typeOfUser: torusPubKey.typeOfUser,
                         pubKey: {
@@ -3405,27 +3407,27 @@ var CustomAuth = /*#__PURE__*/ (function () {
                       };
                       return _context2.abrupt("return", _objectSpread(_objectSpread({}, res), _torusKey));
 
-                    case 44:
+                    case 45:
                       skip = true;
 
                       if (!(checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew)) {
-                        _context2.next = 54;
+                        _context2.next = 55;
                         break;
                       }
 
-                      _context2.next = 48;
+                      _context2.next = 49;
                       return this.nodeDetailManager.getNodeDetails({
                         verifier: verifier,
                         verifierId: userInfo.verifierId,
                       });
 
-                    case 48:
+                    case 49:
                       _yield$this$nodeDetai2 = _context2.sent;
                       _torusNodeEndpoints = _yield$this$nodeDetai2.torusNodeEndpoints;
-                      _context2.next = 52;
+                      _context2.next = 53;
                       return keyLookup(_torusNodeEndpoints, verifier, userInfo.verifierId);
 
-                    case 52:
+                    case 53:
                       lookupData = _context2.sent;
                       existingPk =
                         lookupData !== null &&
@@ -3451,45 +3453,45 @@ var CustomAuth = /*#__PURE__*/ (function () {
                             }
                           : undefined;
 
-                    case 54:
+                    case 55:
                       _context2.t0 = skipTorusKey;
                       _context2.next =
                         _context2.t0 === SkipTorusKey.IfNew
-                          ? 57
+                          ? 58
                           : _context2.t0 === SkipTorusKey.Always
-                          ? 59
+                          ? 60
                           : _context2.t0 === SkipTorusKey.Never
-                          ? 61
-                          : 63;
+                          ? 62
+                          : 64;
                       break;
 
-                    case 57:
+                    case 58:
                       skip = !existingPk;
-                      return _context2.abrupt("break", 64);
+                      return _context2.abrupt("break", 65);
 
-                    case 59:
+                    case 60:
                       skip = true;
-                      return _context2.abrupt("break", 64);
+                      return _context2.abrupt("break", 65);
 
-                    case 61:
+                    case 62:
                       skip = false;
-                      return _context2.abrupt("break", 64);
-
-                    case 63:
-                      throw new Error("Invalid SkipTorusKey");
+                      return _context2.abrupt("break", 65);
 
                     case 64:
+                      throw new Error("Invalid SkipTorusKey");
+
+                    case 65:
                       if (!skip) {
-                        _context2.next = 68;
+                        _context2.next = 69;
                         break;
                       }
 
                       _context2.t1 = undefined;
-                      _context2.next = 71;
+                      _context2.next = 72;
                       break;
 
-                    case 68:
-                      _context2.next = 70;
+                    case 69:
+                      _context2.next = 71;
                       return this.getTorusKey(
                         verifier,
                         userInfo.verifierId,
@@ -3500,11 +3502,13 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         userInfo.extraVerifierParams
                       );
 
-                    case 70:
+                    case 71:
                       _context2.t1 = _context2.sent;
 
-                    case 71:
+                    case 72:
                       torusKey = _context2.t1;
+                      // eslint-disable-next-line
+                      console.timeEnd("trigger");
                       return _context2.abrupt(
                         "return",
                         _objectSpread(
@@ -3517,7 +3521,7 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         )
                       );
 
-                    case 73:
+                    case 75:
                     case "end":
                       return _context2.stop();
                   }
@@ -3598,7 +3602,9 @@ var CustomAuth = /*#__PURE__*/ (function () {
                 while (1) {
                   switch ((_context3.prev = _context3.next)) {
                     case 0:
-                      // This method shall break if any of the promises fail. This behaviour is intended
+                      // eslint-disable-next-line
+                      console.time("trigger"); // This method shall break if any of the promises fail. This behaviour is intended
+
                       (aggregateVerifierType = args.aggregateVerifierType),
                         (verifierIdentifier = args.verifierIdentifier),
                         (subVerifierDetailsArray = args.subVerifierDetailsArray),
@@ -3608,39 +3614,39 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         (checkIfNewKey = _args$checkIfNewKey2 === void 0 ? false : _args$checkIfNewKey2);
 
                       if (this.isInitialized) {
-                        _context3.next = 3;
+                        _context3.next = 4;
                         break;
                       }
 
                       throw new Error("Not initialized yet");
 
-                    case 3:
+                    case 4:
                       if (!(!aggregateVerifierType || !verifierIdentifier || !Array.isArray(subVerifierDetailsArray))) {
-                        _context3.next = 5;
+                        _context3.next = 6;
                         break;
                       }
 
                       throw new Error("Invalid params");
 
-                    case 5:
+                    case 6:
                       if (!(aggregateVerifierType === AGGREGATE_VERIFIER.SINGLE_VERIFIER_ID && subVerifierDetailsArray.length !== 1)) {
-                        _context3.next = 7;
+                        _context3.next = 8;
                         break;
                       }
 
                       throw new Error("Single id verifier can only have one sub verifier");
 
-                    case 7:
+                    case 8:
                       userInfoPromises = [];
                       loginParamsArray = [];
                       _iterator = _createForOfIteratorHelper(subVerifierDetailsArray);
-                      _context3.prev = 10;
+                      _context3.prev = 11;
 
                       _iterator.s();
 
-                    case 12:
+                    case 13:
                       if ((_step = _iterator.n()).done) {
-                        _context3.next = 37;
+                        _context3.next = 38;
                         break;
                       }
 
@@ -3666,7 +3672,7 @@ var CustomAuth = /*#__PURE__*/ (function () {
                       _loginParams = void 0;
 
                       if (!(hash && queryParameters)) {
-                        _context3.next = 25;
+                        _context3.next = 26;
                         break;
                       }
 
@@ -3676,13 +3682,13 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         (instanceParameters = _handleRedirectParame2.instanceParameters);
 
                       if (!error) {
-                        _context3.next = 21;
+                        _context3.next = 22;
                         break;
                       }
 
                       throw new Error(error);
 
-                    case 21:
+                    case 22:
                       (_accessToken = hashParameters.access_token),
                         (_idToken = hashParameters.id_token),
                         (rest = _objectWithoutProperties(hashParameters, _excluded2)); // State has to be last here otherwise it will be overwritten
@@ -3700,12 +3706,12 @@ var CustomAuth = /*#__PURE__*/ (function () {
                           state: instanceParameters,
                         }
                       );
-                      _context3.next = 33;
+                      _context3.next = 34;
                       break;
 
-                    case 25:
+                    case 26:
                       this.storageHelper.clearOrphanedLoginDetails();
-                      _context3.next = 28;
+                      _context3.next = 29;
                       return this.storageHelper.storeLoginDetails(
                         {
                           method: TORUS_METHOD.TRIGGER_AGGREGATE_LOGIN,
@@ -3714,54 +3720,54 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         loginHandler.nonce
                       );
 
-                    case 28:
-                      _context3.next = 30;
+                    case 29:
+                      _context3.next = 31;
                       return loginHandler.handleLoginWindow({
                         locationReplaceOnRedirect: this.config.locationReplaceOnRedirect,
                         popupFeatures: this.config.popupFeatures,
                       });
 
-                    case 30:
+                    case 31:
                       _loginParams = _context3.sent;
 
                       if (!(this.config.uxMode === UX_MODE.REDIRECT)) {
-                        _context3.next = 33;
+                        _context3.next = 34;
                         break;
                       }
 
                       return _context3.abrupt("return", null);
 
-                    case 33:
+                    case 34:
                       // Fail the method even if one promise fails
                       userInfoPromises.push(loginHandler.getUserInfo(_loginParams));
                       loginParamsArray.push(_loginParams);
 
-                    case 35:
-                      _context3.next = 12;
+                    case 36:
+                      _context3.next = 13;
                       break;
 
-                    case 37:
-                      _context3.next = 42;
+                    case 38:
+                      _context3.next = 43;
                       break;
 
-                    case 39:
-                      _context3.prev = 39;
-                      _context3.t0 = _context3["catch"](10);
+                    case 40:
+                      _context3.prev = 40;
+                      _context3.t0 = _context3["catch"](11);
 
                       _iterator.e(_context3.t0);
 
-                    case 42:
-                      _context3.prev = 42;
+                    case 43:
+                      _context3.prev = 43;
 
                       _iterator.f();
 
-                      return _context3.finish(42);
+                      return _context3.finish(43);
 
-                    case 45:
-                      _context3.next = 47;
+                    case 46:
+                      _context3.next = 48;
                       return Promise.all(userInfoPromises);
 
-                    case 47:
+                    case 48:
                       _userInfoArray = _context3.sent;
                       userInfoArray = _userInfoArray.map(function (userInfo) {
                         return _objectSpread(
@@ -3805,23 +3811,23 @@ var CustomAuth = /*#__PURE__*/ (function () {
                       skip = true;
 
                       if (!(checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew)) {
-                        _context3.next = 68;
+                        _context3.next = 69;
                         break;
                       }
 
-                      _context3.next = 62;
+                      _context3.next = 63;
                       return this.nodeDetailManager.getNodeDetails({
                         verifier: args.verifierIdentifier,
                         verifierId: userInfoData[0].verifierId,
                       });
 
-                    case 62:
+                    case 63:
                       _yield$this$nodeDetai3 = _context3.sent;
                       torusNodeEndpoints = _yield$this$nodeDetai3.torusNodeEndpoints;
-                      _context3.next = 66;
+                      _context3.next = 67;
                       return keyLookup(torusNodeEndpoints, args.verifierIdentifier, userInfoData[0].verifierId);
 
-                    case 66:
+                    case 67:
                       lookupData = _context3.sent;
                       existingPk =
                         lookupData !== null &&
@@ -3847,45 +3853,45 @@ var CustomAuth = /*#__PURE__*/ (function () {
                             }
                           : undefined;
 
-                    case 68:
+                    case 69:
                       _context3.t1 = skipTorusKey;
                       _context3.next =
                         _context3.t1 === SkipTorusKey.IfNew
-                          ? 71
+                          ? 72
                           : _context3.t1 === SkipTorusKey.Always
-                          ? 73
+                          ? 74
                           : _context3.t1 === SkipTorusKey.Never
-                          ? 75
-                          : 77;
+                          ? 76
+                          : 78;
                       break;
 
-                    case 71:
+                    case 72:
                       skip = !existingPk;
-                      return _context3.abrupt("break", 78);
+                      return _context3.abrupt("break", 79);
 
-                    case 73:
+                    case 74:
                       skip = true;
-                      return _context3.abrupt("break", 78);
+                      return _context3.abrupt("break", 79);
 
-                    case 75:
+                    case 76:
                       skip = false;
-                      return _context3.abrupt("break", 78);
-
-                    case 77:
-                      throw new Error("Invalid SkipTorusKey");
+                      return _context3.abrupt("break", 79);
 
                     case 78:
+                      throw new Error("Invalid SkipTorusKey");
+
+                    case 79:
                       if (!skip) {
-                        _context3.next = 82;
+                        _context3.next = 83;
                         break;
                       }
 
                       _context3.t2 = undefined;
-                      _context3.next = 85;
+                      _context3.next = 86;
                       break;
 
-                    case 82:
-                      _context3.next = 84;
+                    case 83:
+                      _context3.next = 85;
                       return this.getTorusKey(
                         verifierIdentifier,
                         aggregateVerifierId,
@@ -3894,11 +3900,13 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         extraVerifierParams
                       );
 
-                    case 84:
+                    case 85:
                       _context3.t2 = _context3.sent;
 
-                    case 85:
+                    case 86:
                       torusKey = _context3.t2;
+                      // eslint-disable-next-line
+                      console.timeEnd("trigger");
                       return _context3.abrupt(
                         "return",
                         _objectSpread(
@@ -3913,7 +3921,7 @@ var CustomAuth = /*#__PURE__*/ (function () {
                         )
                       );
 
-                    case 87:
+                    case 89:
                     case "end":
                       return _context3.stop();
                   }
@@ -3921,7 +3929,7 @@ var CustomAuth = /*#__PURE__*/ (function () {
               },
               _callee3,
               this,
-              [[10, 39, 42, 45]]
+              [[11, 40, 43, 46]]
             );
           })
         );
