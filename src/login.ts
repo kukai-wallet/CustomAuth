@@ -1,5 +1,5 @@
 import { NodeDetailManager } from "@toruslabs/fetch-node-details";
-import Torus, { keccak256, TorusKey } from "@toruslabs/torus.js";
+import Torus, { keccak256, legacyKeyLookup, TorusKey } from "@toruslabs/torus.js";
 
 import createHandler from "./handlers/HandlerFactory";
 import {
@@ -13,6 +13,7 @@ import {
   RedirectResult,
   RedirectResultParams,
   SingleLoginParams,
+  SkipTorusKey,
   SubVerifierDetails,
   TorusAggregateLoginResponse,
   TorusHybridAggregateLoginResponse,
@@ -124,8 +125,19 @@ class CustomAuth {
     this.isInitialized = true;
   }
 
-  async triggerLogin(args: SingleLoginParams): Promise<TorusLoginResponse> {
-    const { verifier, typeOfLogin, clientId, jwtParams, hash, queryParameters, customState, registerOnly } = args;
+  async triggerLogin(args: SingleLoginParams & { skipTorusKey?: SkipTorusKey; checkIfNewKey?: boolean }): Promise<TorusLoginResponse> {
+    const {
+      verifier,
+      typeOfLogin,
+      clientId,
+      jwtParams,
+      hash,
+      queryParameters,
+      customState,
+      registerOnly,
+      skipTorusKey = SkipTorusKey.Never,
+      checkIfNewKey = false,
+    } = args;
     log.info("Verifier: ", verifier);
     if (!this.isInitialized) {
       throw new Error("Not initialized yet");
@@ -192,15 +204,40 @@ class CustomAuth {
       };
     }
 
-    const torusKey = await this.getTorusKey(
-      verifier,
-      userInfo.verifierId,
-      { verifier_id: userInfo.verifierId },
-      loginParams.idToken || loginParams.accessToken,
-      userInfo.extraVerifierParams
-    );
+    let skip = true;
+    let existingPk: { X: string; Y: string };
+    if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
+      const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails({ verifier, verifierId: userInfo.verifierId });
+      const lookupData = await legacyKeyLookup(torusNodeEndpoints, verifier, userInfo.verifierId);
+      existingPk = lookupData?.keyResult?.keys?.length
+        ? { X: lookupData?.keyResult?.keys[0].pub_key_X, Y: lookupData?.keyResult?.keys[0].pub_key_Y }
+        : undefined;
+    }
+    switch (skipTorusKey) {
+      case SkipTorusKey.IfNew:
+        skip = !existingPk;
+        break;
+      case SkipTorusKey.Always:
+        skip = true;
+        break;
+      case SkipTorusKey.Never:
+        skip = false;
+        break;
+      default:
+        throw new Error("Invalid SkipTorusKey");
+    }
+    const torusKey = skip
+      ? (undefined as TorusKey)
+      : await this.getTorusKey(
+          verifier,
+          userInfo.verifierId,
+          { verifier_id: userInfo.verifierId },
+          loginParams.idToken || loginParams.accessToken,
+          userInfo.extraVerifierParams
+        );
     return {
       ...torusKey,
+      existingPk,
       userInfo: {
         ...userInfo,
         ...loginParams,
@@ -208,9 +245,11 @@ class CustomAuth {
     };
   }
 
-  async triggerAggregateLogin(args: AggregateLoginParams): Promise<TorusAggregateLoginResponse> {
+  async triggerAggregateLogin(
+    args: AggregateLoginParams & { skipTorusKey?: SkipTorusKey; checkIfNewKey?: boolean }
+  ): Promise<TorusAggregateLoginResponse> {
     // This method shall break if any of the promises fail. This behaviour is intended
-    const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray } = args;
+    const { aggregateVerifierType, verifierIdentifier, subVerifierDetailsArray, skipTorusKey = SkipTorusKey.Never, checkIfNewKey = false } = args;
     if (!this.isInitialized) {
       throw new Error("Not initialized yet");
     }
@@ -277,9 +316,38 @@ class CustomAuth {
     aggregateIdTokenSeeds.sort();
     const aggregateIdToken = keccak256(Buffer.from(aggregateIdTokenSeeds.join(String.fromCharCode(29)), "utf8")).slice(2);
     aggregateVerifierParams.verifier_id = aggregateVerifierId;
-    const torusKey = await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
+    const userInfoData = userInfoArray.map((x, index) => ({ ...x, ...loginParamsArray[index] }));
+    let skip = true;
+    let existingPk: { X: string; Y: string };
+    if (checkIfNewKey || skipTorusKey === SkipTorusKey.IfNew) {
+      const { torusNodeEndpoints } = await this.nodeDetailManager.getNodeDetails({
+        verifier: args.verifierIdentifier,
+        verifierId: userInfoData[0].verifierId,
+      });
+      const lookupData = await legacyKeyLookup(torusNodeEndpoints, args.verifierIdentifier, userInfoData[0].verifierId);
+      existingPk = lookupData?.keyResult?.keys?.length
+        ? { X: lookupData?.keyResult?.keys[0].pub_key_X, Y: lookupData?.keyResult?.keys[0].pub_key_Y }
+        : undefined;
+    }
+    switch (skipTorusKey) {
+      case SkipTorusKey.IfNew:
+        skip = !existingPk;
+        break;
+      case SkipTorusKey.Always:
+        skip = true;
+        break;
+      case SkipTorusKey.Never:
+        skip = false;
+        break;
+      default:
+        throw new Error("Invalid SkipTorusKey");
+    }
+    const torusKey = skip
+      ? (undefined as TorusKey)
+      : await this.getTorusKey(verifierIdentifier, aggregateVerifierId, aggregateVerifierParams, aggregateIdToken, extraVerifierParams);
     return {
       ...torusKey,
+      existingPk,
       userInfo: userInfoArray.map((x, index) => ({ ...x, ...loginParamsArray[index] })),
     };
   }

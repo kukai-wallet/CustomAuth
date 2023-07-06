@@ -4,6 +4,16 @@ import { TorusKey } from "@toruslabs/torus.js";
 import { Sentry } from "../sentry";
 import { AGGREGATE_VERIFIER_TYPE, LOGIN_TYPE, TORUS_METHOD_TYPE, UX_MODE_TYPE } from "../utils/enums";
 
+export interface ExtendedTorusKey extends TorusKey {
+  existingPk?: { X: string; Y: string }; // if any
+}
+
+export enum SkipTorusKey {
+  Never,
+  IfNew,
+  Always,
+}
+
 export type TorusGenericObject = {
   [key: string]: string;
 };
@@ -79,9 +89,9 @@ export interface TorusSingleVerifierResponse {
   userInfo: TorusVerifierResponse & LoginWindowResponse;
 }
 
-export type TorusLoginResponse = TorusSingleVerifierResponse & TorusKey;
-export type TorusAggregateLoginResponse = TorusAggregateVerifierResponse & TorusKey;
-export type TorusHybridAggregateLoginResponse = { singleLogin: TorusLoginResponse; aggregateLogins: TorusKey[] };
+export type TorusLoginResponse = TorusSingleVerifierResponse & ExtendedTorusKey;
+export type TorusAggregateLoginResponse = TorusAggregateVerifierResponse & ExtendedTorusKey;
+export type TorusHybridAggregateLoginResponse = { singleLogin: TorusLoginResponse; aggregateLogins: ExtendedTorusKey[] };
 
 export interface CustomAuthArgs {
   /**
